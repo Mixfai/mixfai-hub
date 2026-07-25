@@ -24,7 +24,14 @@ export const clerkAppearance = {
     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
   },
   elements: {
-    card: 'bg-transparent shadow-none border-0',
+    // Force the card + modal surfaces dark with strong contrast (kills the
+    // default white modal that made dark text invisible).
+    cardBox: 'bg-zinc-900 border border-zinc-800 shadow-2xl rounded-2xl',
+    card: 'bg-zinc-900 shadow-none border-0',
+    modalContent: 'bg-zinc-900 text-zinc-200 rounded-2xl',
+    modalBackdrop: 'bg-black/70 backdrop-blur-sm',
+    // Hide the tiny default close box; provide our own visible close button.
+    modalCloseButtonBox: 'hidden',
     headerTitle: 'text-zinc-50 font-bold',
     headerSubtitle: 'text-zinc-400',
     socialButtonsBlockButton:
