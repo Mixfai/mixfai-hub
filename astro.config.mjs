@@ -11,6 +11,8 @@ import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
+  // Canonical/OG URLs resolve against this. Set SITE_URL in Vercel for custom domains.
+  site: process.env.SITE_URL || 'https://mixfai-hub.vercel.app',
   vite: {
     plugins: [tailwindcss()]
   },

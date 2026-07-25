@@ -1,6 +1,7 @@
 ---
 import { UserButton, OrganizationSwitcher, Show } from '@clerk/astro/react';
 import ArmoryFilter from '../components/ArmoryFilter';
+import MobileSidebar from '../components/MobileSidebar';
 import { getPrompts, getSopPlaybooks } from '../lib/data';
 import { isEmployee, isSignedIn } from '../lib/auth';
 import '../styles/global.css';
@@ -11,6 +12,10 @@ export const prerender = false;
 const [playbooks, prompts] = await Promise.all([getSopPlaybooks(), getPrompts()]);
 const employee = isEmployee(Astro);
 const signedIn = isSignedIn(Astro);
+
+const SITE = 'SyntaxHQ';
+const DESCRIPTION = 'SyntaxHQ Prompt Armory — a curated, battle-tested library of high-performance AI prompts. Browse free, customize variables, and build your own prompt portfolio.';
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).toString();
 
 const statusStyles: Record<string, string> = {
   active: 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10',
@@ -26,7 +31,20 @@ const statusStyles: Record<string, string> = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
-    <title>SyntaxHQ — Prompt Armory</title>
+    <title>{SITE} — Prompt Armory</title>
+
+    <!-- SEO / social -->
+    <meta name="description" content={DESCRIPTION} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#09090b" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE} />
+    <meta property="og:title" content={`${SITE} — Prompt Armory`} />
+    <meta property="og:description" content={DESCRIPTION} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={`${SITE} — Prompt Armory`} />
+    <meta name="twitter:description" content={DESCRIPTION} />
   </head>
 
   <body class="min-h-screen bg-zinc-950 font-sans text-zinc-200 antialiased">
@@ -43,6 +61,9 @@ const statusStyles: Record<string, string> = {
         class="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-950/70 backdrop-blur-xl"
       >
         <div class="flex h-16 items-center justify-between gap-4 px-6">
+          <!-- Mobile SOP drawer trigger -->
+          <MobileSidebar client:load playbooks={playbooks} />
+
           <!-- Logo -->
           <a href="/" class="group flex items-center gap-3">
             <span

@@ -13,7 +13,19 @@ export default function FillVariables({ promptContent }: { promptContent: string
   const [values, setValues] = useState<Record<string, string>>({});
   const [copied, setCopied] = useState(false);
 
-  if (variables.length === 0) return null;
+  // No [VARIABLES]? Show a gentle hint so guests learn the convention.
+  if (variables.length === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-zinc-700 bg-zinc-900/30 p-4">
+        <p className="flex items-center gap-2 font-mono text-xs text-zinc-500">
+          <Wand2 className="h-4 w-4 text-cyan-400/70" />
+          This prompt has no fill-in variables. Prompts with{' '}
+          <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-cyan-300">[TOKENS_LIKE_THIS]</code>{' '}
+          can be customized here.
+        </p>
+      </div>
+    );
+  }
 
   const compiled = variables.reduce(
     (text, v) => text.split(`[${v}]`).join(values[v]?.trim() ? values[v] : `[${v}]`),

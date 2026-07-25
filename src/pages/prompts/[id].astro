@@ -22,6 +22,8 @@ if (isSanityConfigured && sanityClient && id) {
 if (!prompt) {
   return Astro.redirect('/');
 }
+
+const desc = (prompt.useCase ?? `${prompt.title} — a ${prompt.category} prompt for ${prompt.targetModel} on SyntaxHQ.`).slice(0, 160);
 ---
 
 <!doctype html>
@@ -30,6 +32,11 @@ if (!prompt) {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{prompt.title} — SyntaxHQ</title>
+    <meta name="description" content={desc} />
+    <meta property="og:title" content={`${prompt.title} — SyntaxHQ`} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:type" content="article" />
+    <meta name="twitter:card" content="summary" />
   </head>
   <body class="min-h-screen bg-zinc-950 font-sans text-zinc-200 antialiased">
     <div class="pointer-events-none fixed inset-0 bg-[linear-gradient(to_right,#18181b_1px,transparent_1px),linear-gradient(to_bottom,#18181b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,#000_60%,transparent_100%)]"></div>
