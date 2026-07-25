@@ -1,38 +1,49 @@
 import type { APIRoute } from 'astro';
 import { isEmployeeApi } from '../../../lib/auth';
+import { sanityClient, isSanityConfigured, isSanityWriteConfigured } from '../../../lib/sanity';
+import { PENDING_CANDIDATES_QUERY } from '../../../lib/queries';
 
 export const prerender = false;
 
 /**
- * TEMPORARY diagnostic — shows what Clerk reports for the current session so we
- * can verify org membership + env gating. DELETE after go-live verification.
+ * TEMPORARY diagnostic — exercises the exact code paths /review uses and
+ * returns any thrown error so we can see the real 500 cause. DELETE after go-live.
  */
-export const GET: APIRoute = (context) => {
+export const GET: APIRoute = async (context) => {
   let auth: any = null;
   try {
     auth = context.locals.auth?.();
-  } catch (e) {
-    /* noop */
+  } catch (e: any) {
+    auth = { authError: String(e?.message ?? e) };
   }
-  return new Response(
-    JSON.stringify(
-      {
-        hasAuthFn: typeof context.locals.auth === 'function',
-        userId: auth?.userId ?? null,
-        orgId: auth?.orgId ?? null,
-        orgSlug: auth?.orgSlug ?? null,
-        orgRole: auth?.orgRole ?? null,
-        isEmployee: isEmployeeApi(context),
-        env: {
-          MIXFAI_ORG_SLUG: (import.meta.env.MIXFAI_ORG_SLUG as string | undefined) ?? null,
-          MIXFAI_ORG_ID_set: Boolean(import.meta.env.MIXFAI_ORG_ID),
-          MOONSHOT_KEY_set: Boolean(import.meta.env.MOONSHOT_API_KEY),
-          SANITY_WRITE_set: Boolean(import.meta.env.SANITY_WRITE_TOKEN),
-        },
-      },
-      null,
-      2,
-    ),
-    { status: 200, headers: { 'Content-Type': 'application/json' } },
-  );
+
+  const out: Record<string, any> = {
+    hasAuthFn: typeof context.locals.auth === 'function',
+    userId: auth?.userId ?? null,
+    orgSlug: auth?.orgSlug ?? null,
+    isEmployee: isEmployeeApi(context),
+    sanity: { isSanityConfigured, isSanityWriteConfigured },
+    env: {
+      MIXFAI_ORG_SLUG: (import.meta.env.MIXFAI_ORG_SLUG as string | undefined) ?? null,
+      MOONSHOT_KEY_set: Boolean(import.meta.env.MOONSHOT_API_KEY),
+      SANITY_WRITE_set: Boolean(import.meta.env.SANITY_WRITE_TOKEN),
+      SANITY_PROJECT_ID: (import.meta.env.SANITY_PROJECT_ID as string | undefined) ?? null,
+    },
+    checks: {} as Record<string, string>,
+  };
+
+  // Mimic /review's Sanity fetch exactly.
+  try {
+    const rows = await (isSanityConfigured && sanityClient
+      ? sanityClient.fetch(PENDING_CANDIDATES_QUERY)
+      : []);
+    out.checks.candidatesFetch = `OK (${Array.isArray(rows) ? rows.length : '?'} rows)`;
+  } catch (e: any) {
+    out.checks.candidatesFetch = `THROW: ${e?.message ?? String(e)}`;
+  }
+
+  return new Response(JSON.stringify(out, null, 2), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  });
 };
