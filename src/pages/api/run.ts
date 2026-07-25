@@ -31,7 +31,8 @@ export const POST: APIRoute = async (context) => {
     const client = new OpenAI({ apiKey, baseURL });
     const res = await client.chat.completions.create({
       model,
-      temperature: 0.7,
+      // kimi-k3 only allows temperature=1 (reasoning model constraint).
+      temperature: 1,
       // Generous budget: kimi-k3 is a reasoning model that spends tokens on
       // reasoning_content before producing the final content.
       max_tokens: 2000,

@@ -52,7 +52,8 @@ export async function judgePrompt(content: string): Promise<JudgeResult> {
   try {
     const res = await client.chat.completions.create({
       model,
-      temperature: 0,
+      // kimi-k3 only allows temperature=1 (reasoning model constraint).
+      temperature: 1,
       // kimi-k3 is a reasoning model; allow budget for reasoning + final JSON.
       max_tokens: 1500,
       messages: [
