@@ -1,15 +1,23 @@
 # SyntaxHQ — Go-Live Runbook
 
+> **Status: LIVE** ✅ — https://mixfai-hub.vercel.app (go-live completed 2026-07-25)
+> Verified: branded sign-in, Armory, employee Review (Run Judge + Preview via Kimi), Approve, Submit, Collections, Editor's Choice, Studio.
+
 Code-side go-live is **done**: pushed to `Mixfai/mixfai-hub` (Vercel auto-redeploys) and `sanity schema deploy` completed. Remaining steps are runtime configuration.
+
+## Production config notes (learned during go-live)
+- **Moonshot base URL is `https://api.moonshot.cn/v1`** (NOT `.ai`) — the API key is on the China platform. `MOONSHOT_MODEL=kimi-k3` (confirmed valid + 200). Wrong host → `401 Invalid Authentication`.
+- **Sanity/Vercel tokens must be pasted as a single clean line** — no trailing newline/space/quotes, else every Sanity call throws `Invalid character in header content ["authorization"]` → 500. Code sanitizes this defensively (`src/lib/sanity.ts`).
+- **Employee = member of Clerk org slug `mixfai`**; user must switch/activate that org (or set it as default) for `auth().orgSlug` to populate.
 
 ## 1. Vercel → mixfai-hub → Settings → Environment Variables
 Add/update, then **Redeploy**:
 | Key | Value | Notes |
 | --- | --- | --- |
 | `SANITY_WRITE_TOKEN` | `<Editor token>` | sanity.io/manage → project `ese0i6jm` → API → Tokens → **Editor** |
-| `MOONSHOT_API_KEY` | `sk-...` | Kimi judge + preview |
-| `MOONSHOT_BASE_URL` | `https://api.moonshot.ai/v1` | |
-| `MOONSHOT_MODEL` | `moonshot-v1-8k` | |
+| `MOONSHOT_API_KEY` | `sk-...` | Kimi judge + preview (China-platform key) |
+| `MOONSHOT_BASE_URL` | `https://api.moonshot.cn/v1` | **`.cn` not `.ai`** |
+| `MOONSHOT_MODEL` | `kimi-k3` | confirmed valid |
 | `MIXFAI_ORG_SLUG` | `mixfai` | employee gating |
 | `JUDGE_AUTO_APPROVE_THRESHOLD` | `80` | optional |
 | (already set) | `PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `SANITY_PROJECT_ID`, `SANITY_DATASET`, `SANITY_API_VERSION`, `SANITY_READ_TOKEN` | |

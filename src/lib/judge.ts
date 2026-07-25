@@ -53,14 +53,18 @@ export async function judgePrompt(content: string): Promise<JudgeResult> {
     const res = await client.chat.completions.create({
       model,
       temperature: 0,
-      response_format: { type: 'json_object' },
+      // kimi-k3 is a reasoning model; allow budget for reasoning + final JSON.
+      max_tokens: 1500,
       messages: [
         { role: 'system', content: SYSTEM },
         { role: 'user', content: `Prompt to judge:\n\n${content}` },
       ],
     });
-    const text = res.choices[0]?.message?.content ?? '{}';
-    const parsed = JSON.parse(text);
+    const msg: any = res.choices[0]?.message ?? {};
+    const text: string = msg.content ?? msg.reasoning_content ?? '{}';
+    // Extract the first {...} block (reasoning models may wrap output).
+    const match = text.match(/\{[\s\S]*\}/);
+    const parsed = JSON.parse(match ? match[0] : text);
     const score = Math.max(0, Math.min(100, Number(parsed.score) || 0));
     return {
       score,

@@ -32,11 +32,17 @@ export const POST: APIRoute = async (context) => {
     const res = await client.chat.completions.create({
       model,
       temperature: 0.7,
-      max_tokens: 800,
+      // Generous budget: kimi-k3 is a reasoning model that spends tokens on
+      // reasoning_content before producing the final content.
+      max_tokens: 2000,
       messages: [{ role: 'user', content }],
     });
-    const output = res.choices[0]?.message?.content ?? '';
-    return new Response(JSON.stringify({ ok: true, output }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    const msg: any = res.choices[0]?.message ?? {};
+    const output: string = msg.content ?? msg.reasoning_content ?? '';
+    return new Response(JSON.stringify({ ok: true, output: output || '(empty response from model)' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (err) {
     return new Response(JSON.stringify({ error: 'run failed', detail: String(err) }), { status: 500 });
   }
