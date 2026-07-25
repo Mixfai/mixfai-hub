@@ -16,12 +16,12 @@ export default function MobileSidebar({ playbooks }: { playbooks: SopPlaybook[] 
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="lg:hidden">
+    <>
       <button
         type="button"
         aria-label="Open SOP Playbooks"
         onClick={() => setOpen(true)}
-        className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/70 text-zinc-300 transition-colors hover:border-emerald-500/50 hover:text-emerald-300"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/70 text-zinc-300 transition-colors hover:border-emerald-500/50 hover:text-emerald-300 lg:hidden"
       >
         <BookOpen className="h-4 w-4" />
       </button>
@@ -71,6 +71,6 @@ export default function MobileSidebar({ playbooks }: { playbooks: SopPlaybook[] 
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
