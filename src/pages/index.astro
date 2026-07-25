@@ -1,11 +1,164 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import { UserButton } from '@clerk/astro/react';
+import PromptCard from '../components/PromptCard';
+import { getPrompts, getSopPlaybooks } from '../lib/data';
+import '../styles/global.css';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// ── Live data from Sanity (falls back to mock data until .env is configured) ──
+const [playbooks, prompts] = await Promise.all([getSopPlaybooks(), getPrompts()]);
+
+const statusStyles: Record<string, string> = {
+  active: 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10',
+  standby: 'text-amber-400 border-amber-500/40 bg-amber-500/10',
+  archived: 'text-zinc-500 border-zinc-700 bg-zinc-800/40',
+};
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>SyntaxHQ — Prompt Armory</title>
+  </head>
+
+  <body class="min-h-screen bg-zinc-950 font-sans text-zinc-200 antialiased">
+    <!-- Ambient grid + glow backdrop -->
+    <div
+      class="pointer-events-none fixed inset-0 bg-[linear-gradient(to_right,#18181b_1px,transparent_1px),linear-gradient(to_bottom,#18181b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,#000_60%,transparent_100%)]"
+    >
+    </div>
+    <div class="pointer-events-none fixed -top-40 left-1/2 h-96 w-[42rem] -translate-x-1/2 rounded-full bg-emerald-500/10 blur-[120px]"></div>
+
+    <div class="relative flex min-h-screen flex-col">
+      <!-- ── Sticky Top Navbar ─────────────────────────────────────────── -->
+      <header
+        class="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-950/70 backdrop-blur-xl"
+      >
+        <div class="flex h-16 items-center justify-between gap-4 px-6">
+          <!-- Logo -->
+          <a href="/" class="group flex items-center gap-3">
+            <span
+              class="flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-500/40 bg-emerald-500/10 font-mono text-lg font-bold text-emerald-400 shadow-[0_0_16px_-2px_rgba(16,185,129,0.4)] transition-shadow group-hover:shadow-[0_0_24px_-2px_rgba(16,185,129,0.7)]"
+            >
+              >_
+            </span>
+            <div class="leading-tight">
+              <span class="block font-mono text-base font-bold tracking-tight text-zinc-50">
+                Syntax<span class="text-emerald-400">HQ</span>
+              </span>
+              <span class="block font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+                Internal Ops Console
+              </span>
+            </div>
+          </a>
+
+          <!-- Status + User -->
+          <div class="flex items-center gap-4">
+            <span
+              class="hidden items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/5 px-3 py-1 font-mono text-[11px] text-emerald-300 sm:inline-flex"
+            >
+              <span class="relative flex h-2 w-2">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+              </span>
+              SECURE // ONLINE
+            </span>
+            <div class="rounded-full ring-1 ring-zinc-700/80 transition-shadow hover:ring-emerald-500/50">
+              <UserButton client:load />
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ── Body: Sidebar + Main ──────────────────────────────────────── -->
+      <div class="mx-auto flex w-full max-w-[1600px] flex-1">
+        <!-- Left Sidebar: SOP Playbooks -->
+        <aside
+          class="hidden w-72 shrink-0 border-r border-zinc-800/80 bg-zinc-900/30 p-5 backdrop-blur-md lg:block"
+        >
+          <div class="mb-4 flex items-center justify-between">
+            <h2 class="font-mono text-xs font-semibold uppercase tracking-[0.25em] text-zinc-400">
+              SOP Playbooks
+            </h2>
+            <span class="rounded-md border border-zinc-700 bg-zinc-800/60 px-2 py-0.5 font-mono text-[10px] text-zinc-400">
+              {playbooks.length}
+            </span>
+          </div>
+
+          <nav class="space-y-1.5">
+            {playbooks.map((sop) => (
+              <a
+                href="#"
+                class="group flex items-center justify-between gap-2 rounded-lg border border-transparent px-3 py-2.5 transition-all hover:border-zinc-700/80 hover:bg-zinc-800/50"
+              >
+                <div class="min-w-0">
+                  <p class="truncate font-mono text-xs text-zinc-500 group-hover:text-emerald-400">
+                    {sop.code}
+                  </p>
+                  <p class="truncate text-sm font-medium text-zinc-300 group-hover:text-zinc-50">
+                    {sop.name}
+                  </p>
+                </div>
+                <span
+                  class={`shrink-0 rounded-md border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider ${statusStyles[sop.status]}`}
+                >
+                  {sop.status}
+                </span>
+              </a>
+            ))}
+          </nav>
+
+          <div class="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+            <p class="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Session</p>
+            <p class="mt-1 font-mono text-xs text-emerald-300">
+              auth: <span class="text-zinc-400">clerk.verified</span>
+            </p>
+            <p class="font-mono text-xs text-emerald-300">
+              clearance: <span class="text-zinc-400">operator</span>
+            </p>
+          </div>
+        </aside>
+
+        <!-- Main: Prompt Armory -->
+        <main class="flex-1 p-6 sm:p-8">
+          <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p class="font-mono text-xs uppercase tracking-[0.3em] text-emerald-400">
+                // module loaded
+              </p>
+              <h1 class="mt-1 text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+                Prompt <span class="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Armory</span>
+              </h1>
+              <p class="mt-2 max-w-xl font-mono text-sm text-zinc-500">
+                Battle-tested prompt weapons. Copy, deploy, dominate.
+              </p>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs text-zinc-500">
+              <span class="rounded-md border border-zinc-800 bg-zinc-900/60 px-2.5 py-1">
+                {prompts.length} weapons cached
+              </span>
+            </div>
+          </div>
+
+          <!-- Masonry grid -->
+          <div class="columns-1 gap-6 md:columns-2 2xl:columns-3 [&>*]:mb-6 [&>*]:break-inside-avoid">
+            {prompts.map((p) => (
+              <PromptCard client:load {...p} />
+            ))}
+          </div>
+        </main>
+      </div>
+
+      <!-- Footer strip -->
+      <footer class="border-t border-zinc-800/80 bg-zinc-950/60 px-6 py-4 backdrop-blur-md">
+        <p class="text-center font-mono text-[11px] tracking-wider text-zinc-600">
+          SyntaxHQ <span class="text-zinc-700">//</span> internal use only <span class="text-zinc-700">//</span>
+          <span class="text-emerald-500/80">access logged</span>
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>
