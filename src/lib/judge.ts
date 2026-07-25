@@ -61,10 +61,13 @@ export async function judgePrompt(content: string): Promise<JudgeResult> {
       ],
     });
     const msg: any = res.choices[0]?.message ?? {};
-    const text: string = msg.content ?? msg.reasoning_content ?? '{}';
-    // Extract the first {...} block (reasoning models may wrap output).
+    let text: string = msg.content ?? msg.reasoning_content ?? '';
+    // Strip markdown code fences (kimi wraps JSON in ```json ... ```).
+    text = text.replace(/```(?:json)?/gi, '');
+    // Extract the first balanced {...} object.
     const match = text.match(/\{[\s\S]*\}/);
-    const parsed = JSON.parse(match ? match[0] : text);
+    if (!match) throw new Error(`no JSON object in model output: ${text.slice(0, 120)}`);
+    const parsed = JSON.parse(match[0]);
     const score = Math.max(0, Math.min(100, Number(parsed.score) || 0));
     return {
       score,
@@ -77,6 +80,9 @@ export async function judgePrompt(content: string): Promise<JudgeResult> {
     };
   } catch (err) {
     console.error('[judge] Moonshot call failed, using heuristic fallback.', err);
-    return heuristicJudge(content);
+    const fb = heuristicJudge(content);
+    // Surface the real cause so we can debug in prod (instead of the generic msg).
+    fb.reason = `[fallback: ${err instanceof Error ? err.message : String(err)}]`;
+    return fb;
   }
 }
