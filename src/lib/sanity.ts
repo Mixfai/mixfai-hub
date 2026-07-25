@@ -10,8 +10,17 @@ export const SANITY_DATASET = (import.meta.env.SANITY_DATASET as string | undefi
 export const SANITY_API_VERSION =
   (import.meta.env.SANITY_API_VERSION as string | undefined) ?? '2024-01-01';
 
-const readToken = import.meta.env.SANITY_READ_TOKEN as string | undefined;
-const writeToken = import.meta.env.SANITY_WRITE_TOKEN as string | undefined;
+/**
+ * Strip characters that are illegal in HTTP headers (newlines, tabs, stray
+ * spaces, surrounding quotes). A copy-pasted token with a trailing newline
+ * otherwise makes every Sanity call throw "Invalid character in header
+ * content [authorization]" → a 500 across the app.
+ */
+const clean = (v: string | undefined): string | undefined =>
+  v ? v.replace(/[\r\n\t]+/g, '').trim().replace(/^["']|["']$/g, '') : undefined;
+
+const readToken = clean(import.meta.env.SANITY_READ_TOKEN as string | undefined);
+const writeToken = clean(import.meta.env.SANITY_WRITE_TOKEN as string | undefined);
 
 /** True when read credentials are present (live reads; else mock fallback). */
 export const isSanityConfigured = Boolean(SANITY_PROJECT_ID && readToken);

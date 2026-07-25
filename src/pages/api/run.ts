@@ -9,7 +9,10 @@ export const prerender = false;
  * returns the model's response, so an employee can see the likely result while
  * judging. Costs tokens, hence the org gate.
  */
-const apiKey = import.meta.env.MOONSHOT_API_KEY as string | undefined;
+const clean = (v: string | undefined): string | undefined =>
+  v ? v.replace(/[\r\n\t]+/g, '').trim().replace(/^["']|["']$/g, '') : undefined;
+
+const apiKey = clean(import.meta.env.MOONSHOT_API_KEY as string | undefined);
 const baseURL = (import.meta.env.MOONSHOT_BASE_URL as string | undefined) ?? 'https://api.moonshot.ai/v1';
 const model = (import.meta.env.MOONSHOT_MODEL as string | undefined) ?? 'kimi-k3';
 
