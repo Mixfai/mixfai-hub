@@ -7,6 +7,8 @@ Code-side go-live is **done**: pushed to `Mixfai/mixfai-hub` (Vercel auto-redepl
 
 ## Production config notes (learned during go-live)
 - **Moonshot base URL is `https://api.moonshot.cn/v1`** (NOT `.ai`) — the API key is on the China platform. `MOONSHOT_MODEL=kimi-k3` (confirmed valid + 200). Wrong host → `401 Invalid Authentication`.
+- **`kimi-k3` is a reasoning model**: it (a) **only allows `temperature=1`** (any other value → `400 invalid temperature: only 1 is allowed`), (b) returns final output in `content` but reasoning in `reasoning_content` (read both / fall back), and (c) wraps JSON in ```` ```json ```` fences (strip before `JSON.parse`). Give it a generous `max_tokens` (≥1500) so the reasoning doesn't consume the whole budget.
+- **Paste every Vercel env value as a single clean line** (no trailing newline/space/quotes) — a stray `\n` in `MOONSHOT_BASE_URL` or a Sanity token silently breaks calls. Code sanitizes defensively.
 - **Sanity/Vercel tokens must be pasted as a single clean line** — no trailing newline/space/quotes, else every Sanity call throws `Invalid character in header content ["authorization"]` → 500. Code sanitizes this defensively (`src/lib/sanity.ts`).
 - **Employee = member of Clerk org slug `mixfai`**; user must switch/activate that org (or set it as default) for `auth().orgSlug` to populate.
 
