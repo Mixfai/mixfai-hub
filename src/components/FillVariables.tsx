@@ -31,26 +31,29 @@ export default function FillVariables({ promptContent }: { promptContent: string
   };
 
   return (
-    <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-5">
-      <p className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-widest text-cyan-300">
-        <Wand2 className="h-4 w-4" /> Fill variables
+    <div className="rounded-xl border border-cyan-500/50 bg-cyan-500/10 p-5 shadow-[0_0_24px_-8px_rgba(34,211,238,0.4)]">
+      <p className="mb-1 flex items-center gap-2 font-mono text-sm font-semibold uppercase tracking-widest text-cyan-300">
+        <Wand2 className="h-4 w-4" /> Customize this prompt
+      </p>
+      <p className="mb-4 font-mono text-[11px] text-zinc-400">
+        This prompt has <span className="text-cyan-300">{variables.length}</span> variable{variables.length > 1 ? 's' : ''}. Fill them in below to generate your ready-to-use version.
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
         {variables.map((v) => (
           <label key={v} className="block">
-            <span className="mb-1 block font-mono text-[11px] text-zinc-400">[{v}]</span>
+            <span className="mb-1 block font-mono text-[11px] text-cyan-300/80">[{v}]</span>
             <input
               value={values[v] ?? ''}
               onChange={(e) => setValues((s) => ({ ...s, [v]: e.target.value }))}
-              placeholder={v.toLowerCase()}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2 font-mono text-xs text-zinc-200 outline-none transition-colors focus:border-cyan-500/60"
+              placeholder={v.toLowerCase().replace(/_/g, ' ')}
+              className="w-full rounded-lg border border-cyan-500/30 bg-zinc-900/80 px-3 py-2 font-mono text-xs text-zinc-100 placeholder-zinc-600 outline-none transition-colors focus:border-cyan-400/70 focus:bg-zinc-900"
             />
           </label>
         ))}
       </div>
 
-      <div className="mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4">
-        <p className="mb-2 font-mono text-[10px] uppercase tracking-widest text-zinc-600">compiled output</p>
+      <div className="mt-4 rounded-lg border border-zinc-800 bg-zinc-950/80 p-4">
+        <p className="mb-2 font-mono text-[10px] uppercase tracking-widest text-zinc-400">compiled output</p>
         <pre className="max-h-56 overflow-y-auto whitespace-pre-wrap font-mono text-xs leading-relaxed text-emerald-300/90">{compiled}</pre>
       </div>
 

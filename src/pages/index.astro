@@ -1,8 +1,8 @@
 ---
-import { UserButton, OrganizationSwitcher } from '@clerk/astro/react';
+import { UserButton, OrganizationSwitcher, SignInButton, Show } from '@clerk/astro/react';
 import ArmoryFilter from '../components/ArmoryFilter';
 import { getPrompts, getSopPlaybooks } from '../lib/data';
-import { isEmployee } from '../lib/auth';
+import { isEmployee, isSignedIn } from '../lib/auth';
 import '../styles/global.css';
 
 export const prerender = false;
@@ -10,6 +10,7 @@ export const prerender = false;
 // ── Live data from Sanity (falls back to mock data until .env is configured) ──
 const [playbooks, prompts] = await Promise.all([getSopPlaybooks(), getPrompts()]);
 const employee = isEmployee(Astro);
+const signedIn = isSignedIn(Astro);
 
 const statusStyles: Record<string, string> = {
   active: 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10',
@@ -62,9 +63,13 @@ const statusStyles: Record<string, string> = {
           <!-- Nav links + Status + User -->
           <div class="flex items-center gap-4">
             <nav class="hidden items-center gap-1 font-mono text-xs md:flex">
-              <a href="/submit" class="rounded-md px-2.5 py-1.5 text-zinc-400 transition-colors hover:bg-zinc-800/60 hover:text-emerald-300">+ Submit</a>
-              <a href="/my" class="rounded-md px-2.5 py-1.5 text-zinc-400 transition-colors hover:bg-zinc-800/60 hover:text-amber-300">My Collection</a>
-              <a href="/editors-choice" class="rounded-md px-2.5 py-1.5 text-zinc-400 transition-colors hover:bg-zinc-800/60 hover:text-yellow-300">Editor's Choice</a>
+              {signedIn && (
+                <>
+                  <a href="/submit" class="rounded-md px-2.5 py-1.5 text-zinc-300 transition-colors hover:bg-zinc-800/60 hover:text-emerald-300">+ Submit</a>
+                  <a href="/my" class="rounded-md px-2.5 py-1.5 text-zinc-300 transition-colors hover:bg-zinc-800/60 hover:text-amber-300">My Collection</a>
+                </>
+              )}
+              <a href="/editors-choice" class="rounded-md px-2.5 py-1.5 text-zinc-300 transition-colors hover:bg-zinc-800/60 hover:text-yellow-300">Editor's Choice</a>
               {employee && (
                 <>
                   <a href="/review" class="rounded-md px-2.5 py-1.5 text-amber-400 transition-colors hover:bg-zinc-800/60">Review</a>
@@ -79,7 +84,7 @@ const statusStyles: Record<string, string> = {
                 <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
                 <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
               </span>
-              SECURE // ONLINE
+              {signedIn ? 'SECURE // ONLINE' : 'PUBLIC // READ-ONLY'}
             </span>
             {employee && (
               <div class="hidden md:block" title="Active organization">
@@ -94,9 +99,18 @@ const statusStyles: Record<string, string> = {
                 />
               </div>
             )}
-            <div class="rounded-full ring-1 ring-zinc-700/80 transition-shadow hover:ring-emerald-500/50">
-              <UserButton client:load />
-            </div>
+            <Show when="signed-out" client:load>
+              <SignInButton client:load mode="modal">
+                <button class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/20 hover:shadow-[0_0_16px_-4px_rgba(16,185,129,0.5)] active:scale-95">
+                  Sign In
+                </button>
+              </SignInButton>
+            </Show>
+            <Show when="signed-in" client:load>
+              <div class="rounded-full ring-1 ring-zinc-700/80 transition-shadow hover:ring-emerald-500/50">
+                <UserButton client:load />
+              </div>
+            </Show>
           </div>
         </div>
       </header>
@@ -142,10 +156,10 @@ const statusStyles: Record<string, string> = {
           <div class="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
             <p class="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Session</p>
             <p class="mt-1 font-mono text-xs text-emerald-300">
-              auth: <span class="text-zinc-400">clerk.verified</span>
+              auth: <span class="text-zinc-400">{signedIn ? 'clerk.verified' : 'anonymous'}</span>
             </p>
             <p class="font-mono text-xs text-emerald-300">
-              clearance: <span class="text-zinc-400">operator</span>
+              clearance: <span class="text-zinc-400">{employee ? 'employee' : signedIn ? 'operator' : 'guest'}</span>
             </p>
           </div>
         </aside>
@@ -171,6 +185,19 @@ const statusStyles: Record<string, string> = {
             </div>
           </div>
 
+          {!signedIn && (
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-5 py-4">
+              <p class="font-mono text-xs text-zinc-400">
+                <span class="text-emerald-300">You're browsing read-only.</span> Sign in to collect prompts into your portfolio, rate, and submit.
+              </p>
+              <SignInButton client:load mode="modal">
+                <button class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/20 active:scale-95">
+                  Sign In →
+                </button>
+              </SignInButton>
+            </div>
+          )}
+
           <!-- Search / filter / sort + grid (client-hydrated) -->
           <ArmoryFilter client:load prompts={prompts} />
         </main>
@@ -179,8 +206,8 @@ const statusStyles: Record<string, string> = {
       <!-- Footer strip -->
       <footer class="border-t border-zinc-800/80 bg-zinc-950/60 px-6 py-4 backdrop-blur-md">
         <p class="text-center font-mono text-[11px] tracking-wider text-zinc-600">
-          SyntaxHQ <span class="text-zinc-700">//</span> internal use only <span class="text-zinc-700">//</span>
-          <span class="text-emerald-500/80">access logged</span>
+          SyntaxHQ <span class="text-zinc-700">//</span> prompt armory <span class="text-zinc-700">//</span>
+          <span class="text-emerald-500/80">{signedIn ? 'access logged' : 'public read-only'}</span>
         </p>
       </footer>
     </div>

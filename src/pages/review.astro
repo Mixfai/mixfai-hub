@@ -1,5 +1,5 @@
 ---
-import { UserButton } from '@clerk/astro/react';
+import AuthNav from '../components/AuthNav';
 import ReviewConsole from '../components/ReviewConsole';
 import { sanityClient, isSanityConfigured } from '../lib/sanity';
 import { PENDING_CANDIDATES_QUERY } from '../lib/queries';
@@ -31,7 +31,7 @@ if (isSanityConfigured && sanityClient) {
     <div class="relative mx-auto max-w-4xl px-6 py-8">
       <header class="mb-8 flex items-center justify-between">
         <a href="/" class="font-mono text-sm text-emerald-400 hover:text-emerald-300">← armory</a>
-        <UserButton client:load />
+        <AuthNav client:load />
       </header>
 
       <div class="mb-2 font-mono text-xs uppercase tracking-[0.3em] text-amber-400">// employee · staging inbox</div>

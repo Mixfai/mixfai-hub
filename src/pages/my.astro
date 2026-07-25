@@ -1,5 +1,5 @@
 ---
-import { UserButton } from '@clerk/astro/react';
+import AuthNav from '../components/AuthNav';
 import ArmoryFilter from '../components/ArmoryFilter';
 import { sanityClient, isSanityConfigured } from '../lib/sanity';
 import { MY_COLLECTION_IDS_QUERY, PROMPTS_BY_IDS_QUERY } from '../lib/queries';
@@ -32,7 +32,7 @@ if (isSanityConfigured && sanityClient && userId !== 'anonymous') {
     <div class="relative mx-auto max-w-6xl px-6 py-8">
       <header class="mb-8 flex items-center justify-between">
         <a href="/" class="font-mono text-sm text-emerald-400 hover:text-emerald-300">← armory</a>
-        <UserButton client:load />
+        <AuthNav client:load />
       </header>
 
       <div class="mb-2 font-mono text-xs uppercase tracking-[0.3em] text-amber-400">// saved</div>

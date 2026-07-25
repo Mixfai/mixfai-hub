@@ -41,6 +41,11 @@ export function isEmployeeAuth(auth: AuthObject | null): boolean {
   return auth.orgSlug === ORG_SLUG;
 }
 
+/** Signed-in (any authenticated user, employee or not). For .astro pages. */
+export function isSignedIn(Astro: AstroGlobal): boolean {
+  return Boolean(getAuth(Astro.locals)?.userId);
+}
+
 /** For .astro pages. */
 export function isEmployee(Astro: AstroGlobal): boolean {
   return isEmployeeAuth(getAuth(Astro.locals));

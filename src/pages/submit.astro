@@ -1,5 +1,5 @@
 ---
-import { UserButton } from '@clerk/astro/react';
+import AuthNav from '../components/AuthNav';
 import SubmitPrompt from '../components/SubmitPrompt';
 import '../styles/global.css';
 
@@ -17,7 +17,7 @@ export const prerender = false;
     <div class="relative mx-auto max-w-2xl px-6 py-8">
       <header class="mb-8 flex items-center justify-between">
         <a href="/" class="font-mono text-sm text-emerald-400 hover:text-emerald-300">← armory</a>
-        <UserButton client:load />
+        <AuthNav client:load />
       </header>
 
       <div class="mb-2 font-mono text-xs uppercase tracking-[0.3em] text-cyan-400">// contribute</div>

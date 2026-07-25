@@ -1,1 +1,32 @@
 @import "tailwindcss";
+
+/* ── SyntaxHQ global dark-theme fixes ───────────────────────────────────── */
+
+/* Native <select> dropdowns render with OS-default white background + white
+   text on dark pages (illegible). Force dark popover + visible chevron. */
+select {
+  background-color: rgb(24 24 27 / 0.85); /* zinc-900 */
+  color: rgb(228 228 231); /* zinc-200 */
+  color-scheme: dark; /* dark scrollbar + chevron + native popover */
+}
+select option {
+  background-color: rgb(24 24 27);
+  color: rgb(228 228 231);
+}
+
+/* Text inputs / textareas: dark surface, readable text, visible placeholder. */
+input,
+textarea {
+  color-scheme: dark;
+}
+input::placeholder,
+textarea::placeholder {
+  color: rgb(113 113 122); /* zinc-500 */
+  opacity: 1;
+}
+
+/* Thin, theme-matched scrollbars inside scrollable blocks. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(63 63 70) transparent; /* zinc-700 */
+}

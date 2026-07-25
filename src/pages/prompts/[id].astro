@@ -1,16 +1,18 @@
 ---
-import { UserButton } from '@clerk/astro/react';
+import { UserButton, SignInButton, Show } from '@clerk/astro/react';
 import FillVariables from '../../components/FillVariables';
 import StarRating from '../../components/StarRating';
 import CollectButton from '../../components/CollectButton';
 import { sanityClient, isSanityConfigured } from '../../lib/sanity';
 import { PROMPT_BY_ID_QUERY } from '../../lib/queries';
+import { isSignedIn } from '../../lib/auth';
 import type { Prompt } from '../../types';
 import '../../styles/global.css';
 
 export const prerender = false;
 
 const { id } = Astro.params;
+const signedIn = isSignedIn(Astro);
 const userId = Astro.locals.auth()?.userId ?? 'anonymous';
 
 let prompt: Prompt | null = null;
@@ -35,7 +37,16 @@ if (!prompt) {
     <div class="relative mx-auto max-w-4xl px-6 py-8">
       <header class="mb-8 flex items-center justify-between">
         <a href="/" class="font-mono text-sm text-emerald-400 hover:text-emerald-300">← armory</a>
-        <UserButton client:load />
+        <Show when="signed-in" client:load>
+          <UserButton client:load />
+        </Show>
+        <Show when="signed-out" client:load>
+          <SignInButton client:load mode="modal">
+            <button class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/20 active:scale-95">
+              Sign In
+            </button>
+          </SignInButton>
+        </Show>
       </header>
 
       <div class="mb-2 font-mono text-xs uppercase tracking-[0.3em] text-emerald-400">// prompt detail</div>
@@ -60,24 +71,37 @@ if (!prompt) {
         <pre class="whitespace-pre-wrap font-mono text-sm leading-relaxed text-emerald-300/90">{prompt.promptContent}</pre>
       </div>
 
-      <!-- Fill variables -->
+      <!-- Fill variables (public: works without sign-in) -->
       <div class="mt-6">
         <FillVariables client:load promptContent={prompt.promptContent} />
       </div>
 
-      <!-- Actions + rating -->
-      <div class="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
-        <StarRating client:load promptId={prompt._id} userId={userId} />
-        <div class="flex items-center gap-3">
-          <CollectButton client:load promptId={prompt._id} />
-          {prompt.executeUrl && (
-            <a href={prompt.executeUrl} target="_blank" rel="noopener noreferrer"
-               class="inline-flex items-center gap-2 rounded-lg border border-fuchsia-500/40 bg-fuchsia-500/10 px-4 py-2 font-mono text-xs font-semibold text-fuchsia-300 transition-all hover:bg-fuchsia-500/20 active:scale-95">
-              Execute →
-            </a>
-          )}
+      <!-- Portfolio actions: sign-in required -->
+      {signedIn ? (
+        <div class="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
+          <StarRating client:load promptId={prompt._id} userId={userId} />
+          <div class="flex items-center gap-3">
+            <CollectButton client:load promptId={prompt._id} />
+            {prompt.executeUrl && (
+              <a href={prompt.executeUrl} target="_blank" rel="noopener noreferrer"
+                 class="inline-flex items-center gap-2 rounded-lg border border-fuchsia-500/40 bg-fuchsia-500/10 px-4 py-2 font-mono text-xs font-semibold text-fuchsia-300 transition-all hover:bg-fuchsia-500/20 active:scale-95">
+                Execute →
+              </a>
+            )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div class="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-5">
+          <p class="font-mono text-xs text-zinc-400">
+            <span class="text-emerald-300">Want to save this to your portfolio and rate it?</span> Sign in — it's free.
+          </p>
+          <SignInButton client:load mode="modal">
+            <button class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/20 active:scale-95">
+              Sign In →
+            </button>
+          </SignInButton>
+        </div>
+      )}
     </div>
   </body>
 </html>

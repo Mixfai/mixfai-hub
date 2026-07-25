@@ -103,7 +103,7 @@ export default function PromptCard({
           <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
           <span className="h-2.5 w-2.5 rounded-full bg-amber-500/70" />
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/70" />
-          <span className="ml-2 font-mono text-[10px] uppercase tracking-widest text-zinc-600">
+          <span className="ml-2 font-mono text-[10px] uppercase tracking-widest text-zinc-400">
             prompt.txt
           </span>
         </div>

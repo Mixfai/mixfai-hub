@@ -7,7 +7,11 @@ export const prerender = false;
  * POST { promptId, userId, stars } → records a rating and updates the prompt's
  * aggregate qualityScore / ratingCount. Requires an Editor SANITY_WRITE_TOKEN.
  */
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ locals, request }) => {
+  // Ratings are part of a user's portfolio activity — require sign-in.
+  if (!locals.auth()?.userId) {
+    return new Response(JSON.stringify({ error: 'sign in required' }), { status: 401 });
+  }
   if (!isSanityWriteConfigured || !sanityWriteClient) {
     return new Response(JSON.stringify({ error: 'SANITY_WRITE_TOKEN not configured' }), { status: 503 });
   }

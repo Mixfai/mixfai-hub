@@ -1,5 +1,5 @@
 ---
-import { UserButton } from '@clerk/astro/react';
+import AuthNav from '../components/AuthNav';
 import StudioBuilder from '../components/StudioBuilder';
 import { sanityClient, isSanityConfigured } from '../lib/sanity';
 import { PROJECT_PLAYBOOKS_QUERY, PROMPTS_QUERY } from '../lib/queries';
@@ -35,7 +35,7 @@ if (isSanityConfigured && sanityClient) {
     <div class="relative mx-auto max-w-6xl px-6 py-8">
       <header class="mb-8 flex items-center justify-between">
         <a href="/" class="font-mono text-sm text-emerald-400 hover:text-emerald-300">← armory</a>
-        <UserButton client:load />
+        <AuthNav client:load />
       </header>
 
       <div class="mb-2 font-mono text-xs uppercase tracking-[0.3em] text-emerald-400">// employee · internal</div>

@@ -86,7 +86,7 @@ export default function StudioBuilder({
           <div>
             <p className="mb-2 font-mono text-xs text-zinc-500">Steps ({steps.length})</p>
             {steps.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-zinc-800 p-4 text-center font-mono text-xs text-zinc-600">
+              <p className="rounded-lg border border-dashed border-zinc-700 p-4 text-center font-mono text-xs text-zinc-400">
                 add prompts to build the workflow
               </p>
             ) : (
