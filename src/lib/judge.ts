@@ -8,7 +8,7 @@ import type { JudgeResult } from '../types';
 
 const apiKey = import.meta.env.MOONSHOT_API_KEY as string | undefined;
 const baseURL = (import.meta.env.MOONSHOT_BASE_URL as string | undefined) ?? 'https://api.moonshot.ai/v1';
-const model = (import.meta.env.MOONSHOT_MODEL as string | undefined) ?? 'moonshot-v1-8k';
+const model = (import.meta.env.MOONSHOT_MODEL as string | undefined) ?? 'kimi-k3';
 
 export const isJudgeConfigured = Boolean(apiKey);
 
