@@ -30,3 +30,58 @@ textarea::placeholder {
   scrollbar-width: thin;
   scrollbar-color: rgb(63 63 70) transparent; /* zinc-700 */
 }
+
+/* ── Clerk component hard overrides ───────────────────────────────────────
+   The `appearance` prop (baseTheme/elements) is unreliable through Astro
+   island serialization, so force Clerk's own DOM classes to dark theme.
+   Scoped to .cl-rootBox so we don't fight the rest of the app. */
+
+.cl-rootBox,
+.cl-card,
+.cl-cardBox,
+.cl-modalContent {
+  background-color: rgb(24 24 27) !important; /* zinc-900 */
+  color: rgb(228 228 231) !important; /* zinc-200 */
+}
+
+/* All text inside Clerk components → light, unless it's the primary button. */
+.cl-rootBox :where(h1, h2, h3, p, span, label, div, small) {
+  color: rgb(228 228 231) !important; /* zinc-200 */
+}
+/* Muted/secondary text */
+.cl-rootBox :where(.cl-headerSubtitle, .cl-footerActionText, .cl-dividerText, .cl-formFieldHintText, .cl-identityPreviewText, small) {
+  color: rgb(161 161 170) !important; /* zinc-400 */
+}
+
+/* Inputs */
+.cl-rootBox :where(input, .cl-formFieldInput) {
+  background-color: rgb(39 39 42) !important; /* zinc-800 */
+  color: rgb(228 228 231) !important;
+  border-color: rgb(63 63 70) !important; /* zinc-700 */
+}
+.cl-rootBox input::placeholder {
+  color: rgb(113 113 122) !important; /* zinc-500 */
+}
+
+/* Primary button stays emerald with dark text. */
+.cl-formButtonPrimary {
+  background-color: rgb(16 185 129) !important; /* emerald-500 */
+  color: rgb(9 9 11) !important; /* zinc-950 */
+}
+
+/* Links */
+.cl-rootBox a {
+  color: rgb(52 211 153) !important; /* emerald-400 */
+}
+
+/* Social / secondary buttons */
+.cl-socialButtonsBlockButton {
+  background-color: rgb(39 39 42) !important;
+  color: rgb(228 228 231) !important;
+  border-color: rgb(63 63 70) !important;
+}
+
+/* Modal backdrop */
+.cl-modalBackdrop {
+  background-color: rgb(0 0 0 / 0.7) !important;
+}
