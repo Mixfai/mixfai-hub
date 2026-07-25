@@ -1,5 +1,5 @@
 ---
-import { UserButton, OrganizationSwitcher, SignInButton, Show } from '@clerk/astro/react';
+import { UserButton, OrganizationSwitcher, Show } from '@clerk/astro/react';
 import ArmoryFilter from '../components/ArmoryFilter';
 import { getPrompts, getSopPlaybooks } from '../lib/data';
 import { isEmployee, isSignedIn } from '../lib/auth';
@@ -100,11 +100,9 @@ const statusStyles: Record<string, string> = {
               </div>
             )}
             <Show when="signed-out" client:load>
-              <SignInButton client:load mode="modal">
-                <button class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/20 hover:shadow-[0_0_16px_-4px_rgba(16,185,129,0.5)] active:scale-95">
-                  Sign In
-                </button>
-              </SignInButton>
+              <a href="/sign-in" class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/20 hover:shadow-[0_0_16px_-4px_rgba(16,185,129,0.5)] active:scale-95">
+                Sign In
+              </a>
             </Show>
             <Show when="signed-in" client:load>
               <div class="rounded-full ring-1 ring-zinc-700/80 transition-shadow hover:ring-emerald-500/50">
@@ -190,11 +188,9 @@ const statusStyles: Record<string, string> = {
               <p class="font-mono text-xs text-zinc-400">
                 <span class="text-emerald-300">You're browsing read-only.</span> Sign in to collect prompts into your portfolio, rate, and submit.
               </p>
-              <SignInButton client:load mode="modal">
-                <button class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/20 active:scale-95">
-                  Sign In →
-                </button>
-              </SignInButton>
+              <a href="/sign-in" class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/20 active:scale-95">
+                Sign In →
+              </a>
             </div>
           )}
 

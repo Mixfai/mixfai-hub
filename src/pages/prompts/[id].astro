@@ -1,5 +1,5 @@
 ---
-import { UserButton, SignInButton, Show } from '@clerk/astro/react';
+import { UserButton, Show } from '@clerk/astro/react';
 import FillVariables from '../../components/FillVariables';
 import StarRating from '../../components/StarRating';
 import CollectButton from '../../components/CollectButton';
@@ -41,11 +41,9 @@ if (!prompt) {
           <UserButton client:load />
         </Show>
         <Show when="signed-out" client:load>
-          <SignInButton client:load mode="modal">
-            <button class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/20 active:scale-95">
-              Sign In
-            </button>
-          </SignInButton>
+          <a href="/sign-in" class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/20 active:scale-95">
+            Sign In
+          </a>
         </Show>
       </header>
 
@@ -95,11 +93,9 @@ if (!prompt) {
           <p class="font-mono text-xs text-zinc-400">
             <span class="text-emerald-300">Want to save this to your portfolio and rate it?</span> Sign in — it's free.
           </p>
-          <SignInButton client:load mode="modal">
-            <button class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/20 active:scale-95">
-              Sign In →
-            </button>
-          </SignInButton>
+          <a href="/sign-in" class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/20 active:scale-95">
+            Sign In →
+          </a>
         </div>
       )}
     </div>
