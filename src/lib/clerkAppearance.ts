@@ -1,19 +1,22 @@
+import { dark } from '@clerk/themes';
+
 /**
  * Shared Clerk `appearance` theme so sign-in / sign-up match the cyber-terminal
  * SyntaxHQ aesthetic (dark zinc + emerald neon, monospace accents).
  *
- * Note: Clerk renders some text (field hints, footer, OTP, subtitles) with its
- * own default dark-on-light assumptions, so we push the secondary/neutral
- * colors brighter and override the dimmest elements explicitly.
+ * Base = Clerk's official `dark` theme (this is what actually makes Clerk's
+ * internal surfaces + text dark-mode; color variables alone leave it light).
+ * We then override with our zinc/emerald palette.
  */
 export const clerkAppearance = {
+  baseTheme: dark,
   variables: {
     colorBackground: '#09090b', // zinc-950
     colorInputBackground: '#18181b', // zinc-900
     colorInputText: '#e4e4e7', // zinc-200
-    colorText: '#e4e4e7', // zinc-200
-    colorTextSecondary: '#d4d4d8', // zinc-300 (brighter — readable on dark)
-    colorNeutral: '#e4e4e7', // Clerk default text/icons
+    colorText: '#e4e4e7',
+    colorTextSecondary: '#d4d4d8', // zinc-300
+    colorNeutral: '#e4e4e7',
     colorPrimary: '#10b981', // emerald-500
     colorTextOnPrimaryBackground: '#09090b',
     colorDanger: '#f87171',
@@ -46,4 +49,4 @@ export const clerkAppearance = {
     formResendCodeLink: 'text-emerald-400',
     alertText: 'text-zinc-200',
   },
-} as const;
+};
