@@ -1,0 +1,21 @@
+---
+import { SignUp } from '@clerk/astro/react';
+import AuthLayout from '../layouts/AuthLayout.astro';
+import { clerkAppearance } from '../lib/clerkAppearance';
+
+export const prerender = false;
+
+// Already signed in? Send them to the Armory.
+if (Astro.locals.auth?.()?.userId) {
+  return Astro.redirect('/');
+}
+---
+
+<AuthLayout title="Sign Up" heading="request access" sub="Create your operator account. Internal use only.">
+  <SignUp
+    client:load
+    appearance={clerkAppearance}
+    signInUrl="/sign-in"
+    fallbackRedirectUrl="/"
+  />
+</AuthLayout>

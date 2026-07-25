@@ -1,8 +1,8 @@
 import { prompt } from './prompt';
 import { sopPlaybook } from './sopPlaybook';
+import { candidatePrompt } from './candidatePrompt';
+import { rating } from './rating';
+import { collection } from './collection';
+import { projectPlaybook } from './projectPlaybook';
 
-/**
- * Schema registry for the NEW, separate SyntaxHQ Studio.
- * Copy these files into your Studio's schemaTypes/ and export them the same way.
- */
-export const schemaTypes = [prompt, sopPlaybook];
+export const schemaTypes = [prompt, sopPlaybook, candidatePrompt, rating, collection, projectPlaybook];

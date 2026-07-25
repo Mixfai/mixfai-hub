@@ -9,18 +9,21 @@ import type { Prompt } from '../types';
  */
 export type PromptCardProps = Pick<
   Prompt,
-  'title' | 'category' | 'targetModel' | 'promptContent' | 'executeUrl'
+  'title' | 'category' | 'targetModel' | 'promptContent' | 'executeUrl' | 'qualityScore' | 'editorsChoice'
 > & {
   _id?: string;
   status?: Prompt['status'];
 };
 
 export default function PromptCard({
+  _id,
   title,
   category,
   targetModel,
   promptContent,
   executeUrl = 'https://chat.openai.com/',
+  qualityScore,
+  editorsChoice,
 }: PromptCardProps) {
   const [copied, setCopied] = useState(false);
 
@@ -62,8 +65,24 @@ export default function PromptCard({
         <div className="min-w-0">
           <h3 className="truncate font-mono text-sm font-semibold tracking-tight text-zinc-100">
             <span className="mr-1.5 text-emerald-400">▸</span>
-            {title}
+            {_id ? (
+              <a href={`/prompts/${_id}`} className="transition-colors hover:text-emerald-300">
+                {title}
+              </a>
+            ) : (
+              title
+            )}
           </h3>
+          {editorsChoice && (
+            <span className="mt-1 inline-block rounded-md border border-yellow-500/40 bg-yellow-500/10 px-1.5 py-0.5 font-mono text-[10px] text-yellow-300">
+              ★ editor's choice
+            </span>
+          )}
+          {typeof qualityScore === 'number' && qualityScore > 0 && (
+            <span className="mt-1 ml-1 inline-block rounded-md border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[10px] text-emerald-300">
+              {qualityScore}/100
+            </span>
+          )}
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1 rounded-md border border-fuchsia-500/30 bg-fuchsia-500/10 px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-wider text-fuchsia-300">
               <Tag className="h-3 w-3" />

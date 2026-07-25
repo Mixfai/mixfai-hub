@@ -3,17 +3,26 @@ import { clerkMiddleware } from '@clerk/astro/server';
 /**
  * SyntaxHQ — Security Gate
  *
- * The ENTIRE site is private. Any request that is not authenticated by Clerk
- * is redirected to the Clerk-hosted sign-in page. There are no public routes.
+ * The ENTIRE site is private except the branded auth pages. Unauthenticated
+ * users are redirected to our on-site /sign-in (cyber-terminal themed), not
+ * Clerk's hosted page.
  */
-export const onRequest = clerkMiddleware((auth, context, next) => {
-  const { isAuthenticated, redirectToSignIn } = auth();
+const PUBLIC_PATHS = ['/sign-in', '/sign-up'];
 
-  if (!isAuthenticated) {
-    // Bounce unauthenticated users to the Clerk login page.
-    return redirectToSignIn();
+function isPublic(pathname: string): boolean {
+  return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'));
+}
+
+export const onRequest = clerkMiddleware((auth, context, next) => {
+  const { isAuthenticated } = auth();
+  const { pathname } = new URL(context.request.url);
+
+  if (!isAuthenticated && !isPublic(pathname)) {
+    // Bounce to the branded on-site sign-in, preserving where they were headed.
+    const signInUrl = new URL('/sign-in', context.request.url);
+    if (pathname !== '/') signInUrl.searchParams.set('redirect_url', pathname);
+    return context.redirect(signInUrl.toString());
   }
 
-  // Authenticated → allow the request to continue.
   return next();
 });

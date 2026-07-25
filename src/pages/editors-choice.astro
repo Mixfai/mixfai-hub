@@ -1,0 +1,46 @@
+---
+import { UserButton } from '@clerk/astro/react';
+import ArmoryFilter from '../components/ArmoryFilter';
+import { sanityClient, isSanityConfigured } from '../lib/sanity';
+import { EDITORS_CHOICE_QUERY } from '../lib/queries';
+import type { Prompt } from '../types';
+import '../styles/global.css';
+
+export const prerender = false;
+
+let prompts: Prompt[] = [];
+if (isSanityConfigured && sanityClient) {
+  prompts = await sanityClient.fetch<Prompt[]>(EDITORS_CHOICE_QUERY);
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Editor's Choice — SyntaxHQ</title>
+  </head>
+  <body class="min-h-screen bg-zinc-950 font-sans text-zinc-200 antialiased">
+    <div class="relative mx-auto max-w-6xl px-6 py-8">
+      <header class="mb-8 flex items-center justify-between">
+        <a href="/" class="font-mono text-sm text-emerald-400 hover:text-emerald-300">← armory</a>
+        <UserButton client:load />
+      </header>
+
+      <div class="mb-2 font-mono text-xs uppercase tracking-[0.3em] text-yellow-400">// curated</div>
+      <h1 class="text-3xl font-bold tracking-tight text-zinc-50">Editor's Choice</h1>
+      <p class="mt-2 font-mono text-sm text-zinc-500">Hand-picked by Mixfai's editors. The best of the Armory.</p>
+
+      <div class="mt-8">
+        {prompts.length === 0 ? (
+          <p class="rounded-xl border border-zinc-800 bg-zinc-900/40 p-8 text-center font-mono text-sm text-zinc-500">
+            no editor's choice yet // editors mark prompts from the review console
+          </p>
+        ) : (
+          <ArmoryFilter client:load prompts={prompts} />
+        )}
+      </div>
+    </div>
+  </body>
+</html>

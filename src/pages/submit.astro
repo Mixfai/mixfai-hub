@@ -1,0 +1,34 @@
+---
+import { UserButton } from '@clerk/astro/react';
+import SubmitPrompt from '../components/SubmitPrompt';
+import '../styles/global.css';
+
+export const prerender = false;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Submit a Prompt — SyntaxHQ</title>
+  </head>
+  <body class="min-h-screen bg-zinc-950 font-sans text-zinc-200 antialiased">
+    <div class="relative mx-auto max-w-2xl px-6 py-8">
+      <header class="mb-8 flex items-center justify-between">
+        <a href="/" class="font-mono text-sm text-emerald-400 hover:text-emerald-300">← armory</a>
+        <UserButton client:load />
+      </header>
+
+      <div class="mb-2 font-mono text-xs uppercase tracking-[0.3em] text-cyan-400">// contribute</div>
+      <h1 class="text-3xl font-bold tracking-tight text-zinc-50">Submit a Prompt</h1>
+      <p class="mt-2 font-mono text-sm text-zinc-500">
+        Your prompt goes to the staging inbox. A Mixfai employee will judge & review it before it joins the Armory.
+      </p>
+
+      <div class="mt-8">
+        <SubmitPrompt client:load />
+      </div>
+    </div>
+  </body>
+</html>

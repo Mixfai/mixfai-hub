@@ -1,11 +1,15 @@
 ---
 import { UserButton } from '@clerk/astro/react';
-import PromptCard from '../components/PromptCard';
+import ArmoryFilter from '../components/ArmoryFilter';
 import { getPrompts, getSopPlaybooks } from '../lib/data';
+import { isEmployee } from '../lib/auth';
 import '../styles/global.css';
+
+export const prerender = false;
 
 // ── Live data from Sanity (falls back to mock data until .env is configured) ──
 const [playbooks, prompts] = await Promise.all([getSopPlaybooks(), getPrompts()]);
+const employee = isEmployee(Astro);
 
 const statusStyles: Record<string, string> = {
   active: 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10',
@@ -55,8 +59,19 @@ const statusStyles: Record<string, string> = {
             </div>
           </a>
 
-          <!-- Status + User -->
+          <!-- Nav links + Status + User -->
           <div class="flex items-center gap-4">
+            <nav class="hidden items-center gap-1 font-mono text-xs md:flex">
+              <a href="/submit" class="rounded-md px-2.5 py-1.5 text-zinc-400 transition-colors hover:bg-zinc-800/60 hover:text-emerald-300">+ Submit</a>
+              <a href="/my" class="rounded-md px-2.5 py-1.5 text-zinc-400 transition-colors hover:bg-zinc-800/60 hover:text-amber-300">My Collection</a>
+              <a href="/editors-choice" class="rounded-md px-2.5 py-1.5 text-zinc-400 transition-colors hover:bg-zinc-800/60 hover:text-yellow-300">Editor's Choice</a>
+              {employee && (
+                <>
+                  <a href="/review" class="rounded-md px-2.5 py-1.5 text-amber-400 transition-colors hover:bg-zinc-800/60">Review</a>
+                  <a href="/studio" class="rounded-md px-2.5 py-1.5 text-emerald-400 transition-colors hover:bg-zinc-800/60">Studio</a>
+                </>
+              )}
+            </nav>
             <span
               class="hidden items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/5 px-3 py-1 font-mono text-[11px] text-emerald-300 sm:inline-flex"
             >
@@ -143,12 +158,8 @@ const statusStyles: Record<string, string> = {
             </div>
           </div>
 
-          <!-- Masonry grid -->
-          <div class="columns-1 gap-6 md:columns-2 2xl:columns-3 [&>*]:mb-6 [&>*]:break-inside-avoid">
-            {prompts.map((p) => (
-              <PromptCard client:load {...p} />
-            ))}
-          </div>
+          <!-- Search / filter / sort + grid (client-hydrated) -->
+          <ArmoryFilter client:load prompts={prompts} />
         </main>
       </div>
 

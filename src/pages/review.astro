@@ -1,0 +1,48 @@
+---
+import { UserButton } from '@clerk/astro/react';
+import ReviewConsole from '../components/ReviewConsole';
+import { sanityClient, isSanityConfigured } from '../lib/sanity';
+import { PENDING_CANDIDATES_QUERY } from '../lib/queries';
+import { isEmployee } from '../lib/auth';
+import type { CandidatePrompt } from '../types';
+import '../styles/global.css';
+
+export const prerender = false;
+
+// EMPLOYEE-ONLY page (Mixfai org members). Others get bounced home.
+if (!isEmployee(Astro)) {
+  return Astro.redirect('/');
+}
+
+let candidates: CandidatePrompt[] = [];
+if (isSanityConfigured && sanityClient) {
+  candidates = await sanityClient.fetch<CandidatePrompt[]>(PENDING_CANDIDATES_QUERY);
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Review Console — SyntaxHQ</title>
+  </head>
+  <body class="min-h-screen bg-zinc-950 font-sans text-zinc-200 antialiased">
+    <div class="relative mx-auto max-w-4xl px-6 py-8">
+      <header class="mb-8 flex items-center justify-between">
+        <a href="/" class="font-mono text-sm text-emerald-400 hover:text-emerald-300">← armory</a>
+        <UserButton client:load />
+      </header>
+
+      <div class="mb-2 font-mono text-xs uppercase tracking-[0.3em] text-amber-400">// employee · staging inbox</div>
+      <h1 class="text-3xl font-bold tracking-tight text-zinc-50">Review Console</h1>
+      <p class="mt-2 font-mono text-sm text-zinc-500">
+        {candidates.length} candidates awaiting judgment. Run the Kimi judge, preview output, then approve or reject.
+      </p>
+
+      <div class="mt-8">
+        <ReviewConsole client:load candidates={candidates} />
+      </div>
+    </div>
+  </body>
+</html>

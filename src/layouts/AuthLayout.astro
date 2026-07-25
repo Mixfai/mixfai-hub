@@ -1,0 +1,51 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  heading: string;
+  sub: string;
+}
+const { title, heading, sub } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} — SyntaxHQ</title>
+  </head>
+  <body class="flex min-h-screen items-center justify-center bg-zinc-950 font-sans text-zinc-200 antialiased">
+    <!-- Ambient grid + glow -->
+    <div class="pointer-events-none fixed inset-0 bg-[linear-gradient(to_right,#18181b_1px,transparent_1px),linear-gradient(to_bottom,#18181b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,#000_60%,transparent_100%)]"></div>
+    <div class="pointer-events-none fixed -top-40 left-1/2 h-96 w-[42rem] -translate-x-1/2 rounded-full bg-emerald-500/10 blur-[120px]"></div>
+
+    <div class="relative w-full max-w-md px-6">
+      <!-- Logo -->
+      <a href="/" class="mb-8 flex items-center justify-center gap-3">
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-500/40 bg-emerald-500/10 font-mono text-xl font-bold text-emerald-400 shadow-[0_0_20px_-2px_rgba(16,185,129,0.5)]">
+          >_
+        </span>
+        <span class="font-mono text-xl font-bold tracking-tight text-zinc-50">
+          Syntax<span class="text-emerald-400">HQ</span>
+        </span>
+      </a>
+
+      <div class="mb-6 text-center">
+        <p class="font-mono text-xs uppercase tracking-[0.3em] text-emerald-400">// {heading}</p>
+        <p class="mt-2 font-mono text-sm text-zinc-500">{sub}</p>
+      </div>
+
+      <!-- Clerk component mounts here -->
+      <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 backdrop-blur-md">
+        <slot />
+      </div>
+
+      <p class="mt-6 text-center font-mono text-[11px] tracking-wider text-zinc-600">
+        access restricted <span class="text-zinc-700">//</span> <span class="text-emerald-500/80">authorized personnel only</span>
+      </p>
+    </div>
+  </body>
+</html>

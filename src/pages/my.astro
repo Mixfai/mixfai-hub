@@ -1,0 +1,53 @@
+---
+import { UserButton } from '@clerk/astro/react';
+import ArmoryFilter from '../components/ArmoryFilter';
+import { sanityClient, isSanityConfigured } from '../lib/sanity';
+import { MY_COLLECTION_IDS_QUERY, PROMPTS_BY_IDS_QUERY } from '../lib/queries';
+import { currentUserId } from '../lib/auth';
+import type { Prompt } from '../types';
+import '../styles/global.css';
+
+export const prerender = false;
+
+const userId = currentUserId(Astro);
+
+let prompts: Prompt[] = [];
+if (isSanityConfigured && sanityClient && userId !== 'anonymous') {
+  const rows = await sanityClient.fetch<{ promptId: string }[]>(MY_COLLECTION_IDS_QUERY, { userId });
+  const ids = rows.map((r) => r.promptId);
+  if (ids.length > 0) {
+    prompts = await sanityClient.fetch<Prompt[]>(PROMPTS_BY_IDS_QUERY, { ids });
+  }
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Collection — SyntaxHQ</title>
+  </head>
+  <body class="min-h-screen bg-zinc-950 font-sans text-zinc-200 antialiased">
+    <div class="relative mx-auto max-w-6xl px-6 py-8">
+      <header class="mb-8 flex items-center justify-between">
+        <a href="/" class="font-mono text-sm text-emerald-400 hover:text-emerald-300">← armory</a>
+        <UserButton client:load />
+      </header>
+
+      <div class="mb-2 font-mono text-xs uppercase tracking-[0.3em] text-amber-400">// saved</div>
+      <h1 class="text-3xl font-bold tracking-tight text-zinc-50">My Collection</h1>
+      <p class="mt-2 font-mono text-sm text-zinc-500">{prompts.length} starred prompts.</p>
+
+      <div class="mt-8">
+        {prompts.length === 0 ? (
+          <p class="rounded-xl border border-zinc-800 bg-zinc-900/40 p-8 text-center font-mono text-sm text-zinc-500">
+            nothing saved yet // star a prompt from the Armory to build your collection
+          </p>
+        ) : (
+          <ArmoryFilter client:load prompts={prompts} />
+        )}
+      </div>
+    </div>
+  </body>
+</html>

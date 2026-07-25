@@ -1,0 +1,52 @@
+---
+import { UserButton } from '@clerk/astro/react';
+import StudioBuilder from '../components/StudioBuilder';
+import { sanityClient, isSanityConfigured } from '../lib/sanity';
+import { PROJECT_PLAYBOOKS_QUERY, PROMPTS_QUERY } from '../lib/queries';
+import { isEmployee } from '../lib/auth';
+import type { ProjectPlaybook, Prompt } from '../types';
+import '../styles/global.css';
+
+export const prerender = false;
+
+// EMPLOYEE-ONLY internal journey (Mixfai org).
+if (!isEmployee(Astro)) {
+  return Astro.redirect('/');
+}
+
+let playbooks: ProjectPlaybook[] = [];
+let prompts: Prompt[] = [];
+if (isSanityConfigured && sanityClient) {
+  [playbooks, prompts] = await Promise.all([
+    sanityClient.fetch<ProjectPlaybook[]>(PROJECT_PLAYBOOKS_QUERY),
+    sanityClient.fetch<Prompt[]>(PROMPTS_QUERY),
+  ]);
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mixfai Studio — Internal Builder</title>
+  </head>
+  <body class="min-h-screen bg-zinc-950 font-sans text-zinc-200 antialiased">
+    <div class="relative mx-auto max-w-6xl px-6 py-8">
+      <header class="mb-8 flex items-center justify-between">
+        <a href="/" class="font-mono text-sm text-emerald-400 hover:text-emerald-300">← armory</a>
+        <UserButton client:load />
+      </header>
+
+      <div class="mb-2 font-mono text-xs uppercase tracking-[0.3em] text-emerald-400">// employee · internal</div>
+      <h1 class="text-3xl font-bold tracking-tight text-zinc-50">Mixfai Studio</h1>
+      <p class="mt-2 max-w-2xl font-mono text-sm text-zinc-500">
+        Assemble prompts into delivery playbooks for site-building, brand-building, and marketing creative.
+      </p>
+
+      <div class="mt-8">
+        <StudioBuilder client:load playbooks={playbooks} prompts={prompts} />
+      </div>
+    </div>
+  </body>
+</html>
