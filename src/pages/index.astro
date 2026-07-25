@@ -1,5 +1,5 @@
 ---
-import { UserButton } from '@clerk/astro/react';
+import { UserButton, OrganizationSwitcher } from '@clerk/astro/react';
 import ArmoryFilter from '../components/ArmoryFilter';
 import { getPrompts, getSopPlaybooks } from '../lib/data';
 import { isEmployee } from '../lib/auth';
@@ -81,6 +81,19 @@ const statusStyles: Record<string, string> = {
               </span>
               SECURE // ONLINE
             </span>
+            {employee && (
+              <div class="hidden md:block" title="Active organization">
+                <OrganizationSwitcher
+                  client:load
+                  appearance={{
+                    elements: {
+                      organizationSwitcherTrigger:
+                        'border border-zinc-700 bg-zinc-900/70 text-zinc-200 rounded-lg px-2.5 py-1.5 font-mono text-xs hover:border-emerald-500/50',
+                    },
+                  }}
+                />
+              </div>
+            )}
             <div class="rounded-full ring-1 ring-zinc-700/80 transition-shadow hover:ring-emerald-500/50">
               <UserButton client:load />
             </div>
