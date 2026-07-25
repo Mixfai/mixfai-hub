@@ -10,8 +10,8 @@ const clean = (v: string | undefined): string | undefined =>
   v ? v.replace(/[\r\n\t]+/g, '').trim().replace(/^["']|["']$/g, '') : undefined;
 
 const apiKey = clean(import.meta.env.MOONSHOT_API_KEY as string | undefined);
-const baseURL = (import.meta.env.MOONSHOT_BASE_URL as string | undefined) ?? 'https://api.moonshot.cn/v1';
-const model = (import.meta.env.MOONSHOT_MODEL as string | undefined) ?? 'kimi-k3';
+const baseURL = clean(import.meta.env.MOONSHOT_BASE_URL as string | undefined) ?? 'https://api.moonshot.cn/v1';
+const model = clean(import.meta.env.MOONSHOT_MODEL as string | undefined) ?? 'kimi-k3';
 
 export const isJudgeConfigured = Boolean(apiKey);
 
